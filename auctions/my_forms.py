@@ -63,10 +63,15 @@ class ListingForm(forms.ModelForm):
         fields = ['title', 'description', 'startingBid', 'imageURL', 'category']
         labels = {
             'startingBid': "Starting Bid",
-            'imageURL': "Image URL"
+            'imageURL': "Image URL (optional)",
+            'category': "Category (optional"
         }
         placeholder = {
             'title': "Your title here",
+            'description': "Add details about your item",
+            'startingBid': "$0.00",
+            'imageURL': "Add and image url for your item",
+            'category': "Add a catgory for your item"
         }
 
     def __init__(self, *args, **kwargs):
@@ -76,8 +81,6 @@ class ListingForm(forms.ModelForm):
         super(ListingForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class': "form-control"})
-        # self.fields['startingBid'].widget.attrs.update({'placeholder': "Starting Bid"})
-
 
 class AddBid(forms.Form):
     """

@@ -2,31 +2,61 @@
 
 {% block body %}
 <div class="container">
-    <h2>{{ listing.title }}</h2>
-    {% if listing.winner != Null %}
-    <h4>Auction is closed!</h4>
+    {% if message %}
+    <div id="message">
+        <p>{{ message }}</p>
+    </div>
     {% endif %}
-    <img src="{{ listing.image_url }}" alt="{{ listing.title }}">
-    <p class="text-muted"> Listed by {{ listing.owner }} on {{ listing.time }}</p>
-    <p>{{ listing.description }}</p>
-    <p>{{ listing.current_price }}</p>
-    {% if user.is_authenticated %}
-    <form action="{% url 'listings' listing.pk %}" method="POST">
-    {% csrf_token %}
-    <input class="form-check-input" type="number" placeholder="{{ listing.current_price }}">
-    <button name="bid" class="btn-primary" type="submit">Place Bid</button>
-    </form>
 
-    <form action="{% url 'listings' listing.pk %}" method="POST">
-    {% csrf_token %}    
-    {% if listing in user.watchlist.all %}
-    <input class="form-check-input" type="checkbox" checked disabled> 
-    <button name="watchlist" class="btn-primary" type="submit" value="checked">Remove from watchlist</button>
-    {% else %}
-    <input class="form-check-input" type="checkbox" disabled>
-    <button name="watchlist" class="btn-primary" type="submit">Add to Watchlist</button>
+    {% if listing.active == False %}
+    <div id="closed">
+        {% if user == listing.winner %}
+        <h6>Congratulations! You won the auction.</h6>
+        {% else %}
+        <h6>This auction is closed!</h6>
+        {% endif %}
+    </div>        
     {% endif %}
-    </form>
-    {% endif %}
+    
+    <div id="main">
+        <h2>{{ listing.title }}</h2>
+
+        {% if user == listing.owner and listing.active == True %}
+        <form action="{% url 'listings' listing.pk %}" method="POST">
+            {% csrf_token %}
+            <button name="close" class="btn btn-danger" type="submit">Close auction</button>
+        </form>
+        {% endif %}
+
+        
+
+        <img src="{{ listing.imageURL }}" alt="{{ listing.title }}">
+        <p class="text-muted"> Listed by {{ listing.owner }} on {{ listing.time }}</p>
+        <p>{{ listing.description }}</p>
+        <p>{{ listing.startingBid }}</p>
+        <p>{{ listing.currentBid.bid }}</p>
+        
+        {% if user.is_authenticated %}
+        {% if listing.active == True %}
+        <form action="{% url 'listings' listing.pk %}" method="POST">
+            {% csrf_token %}
+            {{ form }}
+            <button name="new_bid" class="btn btn-primary" type="submit">Place Bid</button>
+        </form>
+        {% endif %}
+        <form action="{% url 'listings' listing.pk %}" method="POST">
+            {% csrf_token %}    
+            {% if listing in user.watchlist.all %}
+            <input class="form-check-input" type="checkbox" checked disabled> 
+            <button name="watchlist" class="btn btn-primary" type="submit" value="checked">Remove from watchlist</button>
+            {% else %}
+            {% if listing.active == True %}
+            <input class="form-check-input" type="checkbox" disabled>
+            <button name="watchlist" class="btn btn-primary" type="submit">Add to Watchlist</button>
+            {% endif %}
+            {% endif %}
+        </form>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

@@ -6,8 +6,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Category, Listing, User
-from .my_forms import ListingForm
+from .models import Bid, Category, Listing, User
+from .my_forms import ListingForm, AddBid
 
 def index(request):
     listings = Listing.objects.all().order_by("-time")
@@ -100,18 +100,41 @@ def new_listing(request):
 def listings(request, pk):
     listing = Listing.objects.get(pk=pk)
     if request.method == "POST":
+        user = request.user
+        message = None
         if "watchlist" in request.POST:
             watchlist = request.POST["watchlist"]
-            user = request.user
             if watchlist == "checked":
                 user.watchlist.remove(listing)
             else:
                 user.watchlist.add(listing)
+        elif "new_bid" in request.POST:
+            new_bid = float(request.POST["bid"])            
+            if (listing.currentBid is not None and new_bid < listing.currentBid.bid):
+                message = "Your bid must be higher than the current bid."
+            elif new_bid < listing.startingBid:
+                message = "Your bid must be higher than the starting bid."
+            else:
+                bid = Bid()
+                bid.bidder = user
+                bid.listing = listing
+                bid.bid = new_bid
+                bid.save()
+                listing.currentBid = bid
+                listing.save()
+                message = "Your bid has been added to the auction."
+        elif "close" in request.POST:
+            listing.winner = listing.currentBid.bidder
+            listing.active = False
+            listing.save()
         return render(request, "auctions/listing.html", {
-            "listing": listing
+            "listing": listing,
+            "message": message,
+            "form": AddBid()
         })
 
     else:
         return render(request, "auctions/listing.html", {
-            "listing": listing
+            "listing": listing,
+            "form": AddBid()
         })
