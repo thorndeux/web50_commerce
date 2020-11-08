@@ -24,7 +24,7 @@
         {% if user == listing.owner and listing.active == True %}
         <form action="{% url 'listings' listing.pk %}" method="POST">
             {% csrf_token %}
-            <button name="close" class="btn btn-danger" type="submit">Close auction</button>
+            <button name="close" class="btn btn-danger" type="submit">Close Auction</button>
         </form>
         {% endif %}
 
@@ -33,14 +33,19 @@
         <img src="{{ listing.imageURL }}" alt="{{ listing.title }}">
         <p class="text-muted"> Listed by {{ listing.owner }} on {{ listing.time }}</p>
         <p>{{ listing.description }}</p>
-        <p>{{ listing.startingBid }}</p>
-        <p>{{ listing.currentBid.bid }}</p>
+        <p>Starting bid: {{ listing.startingBid }}</p>
+        <p>{% if listing.active %}
+        Current bid:
+        {% else %}
+        Winning bid:
+        {% endif %}
+        {{ listing.currentBid.bid }}</p>
         
         {% if user.is_authenticated %}
         {% if listing.active == True %}
         <form action="{% url 'listings' listing.pk %}" method="POST">
             {% csrf_token %}
-            {{ form }}
+            {{ bid_form }}
             <button name="new_bid" class="btn btn-primary" type="submit">Place Bid</button>
         </form>
         {% endif %}
@@ -48,7 +53,7 @@
             {% csrf_token %}    
             {% if listing in user.watchlist.all %}
             <input class="form-check-input" type="checkbox" checked disabled> 
-            <button name="watchlist" class="btn btn-primary" type="submit" value="checked">Remove from watchlist</button>
+            <button name="watchlist" class="btn btn-primary" type="submit" value="checked">Remove from Watchlist</button>
             {% else %}
             {% if listing.active == True %}
             <input class="form-check-input" type="checkbox" disabled>
@@ -57,6 +62,24 @@
             {% endif %}
         </form>
         {% endif %}
+    </div>
+    <div id="comments">
+    {% if user.is_authenticated %}
+    <form action="{% url 'listings' listing.pk %}" method="POST">
+    {% csrf_token %}    
+    {{ comment_form }}
+    <button name="new_comment" class="btn btn-primary" type="submit">Add Comment</button>
+    </form>
+    {% endif %}
+    {% for comment in comments %}    
+    <p class="text-muted">
+        {{ comment.commenter }}
+        {{ comment.time }}
+    </p>
+    <p>
+        {{ comment.content }}
+    </p>    
+    {% endfor %}
     </div>
 </div>
 {% endblock %}

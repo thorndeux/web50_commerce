@@ -92,4 +92,21 @@ class AddBid(forms.Form):
         decimal_places=2,
         widget=forms.NumberInput({
             'class': "form-control",
-            'placeholder': "$0.00"}))
+            'placeholder': "$0.00"
+        })
+    )
+
+class AddComment(forms.Form):
+    """
+    Form to add a comment to a listing
+    """
+    comment = forms.CharField(
+        label="Add a comment",
+        max_length=500,
+        widget=forms.Textarea({
+            'class': "form-control",
+            'placeholder': "Enter comment here",
+            'rows': 3,
+            'cols': 15
+        })
+    )

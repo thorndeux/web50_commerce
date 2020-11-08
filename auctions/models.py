@@ -39,7 +39,7 @@ class Comment(models.Model):
     time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.commenter}, {self.listing}, {self.content}"
+        return f"{self.commenter}, {self.time}, {self.content}"
 
 class Category(models.Model):
     name = models.CharField(max_length=64)

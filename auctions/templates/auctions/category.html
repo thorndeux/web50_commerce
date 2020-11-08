@@ -1,9 +1,8 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
-
-    <div class="container-flex">
+<h2>{{ category }}</h2>
+<div class="container-flex">
         <div class="row">
             {% for listing in listings %}
             <div class="card col-12 col-xl-6">
@@ -32,4 +31,4 @@
             {% endfor %}
         </div>
     </div>
-{% endblock %}
+{% endblock body %}

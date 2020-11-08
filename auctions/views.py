@@ -6,8 +6,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Bid, Category, Listing, User
-from .my_forms import ListingForm, AddBid
+from .models import Bid, Category, Comment, Listing, User
+from .my_forms import ListingForm, AddBid, AddComment
 
 def index(request):
     listings = Listing.objects.all().order_by("-time")
@@ -99,6 +99,7 @@ def new_listing(request):
 
 def listings(request, pk):
     listing = Listing.objects.get(pk=pk)
+    comments = Comment.objects.all().order_by("-time")
     if request.method == "POST":
         user = request.user
         message = None
@@ -123,6 +124,14 @@ def listings(request, pk):
                 listing.currentBid = bid
                 listing.save()
                 message = "Your bid has been added to the auction."
+        elif "new_comment" in request.POST:
+            comment = Comment()
+            comment.commenter = user
+            comment.listing = listing
+            comment.content = request.POST["comment"]
+            comment.save()
+            comments = Comment.objects.all().order_by("-time")
+            message = "Your comment has been added"
         elif "close" in request.POST:
             listing.winner = listing.currentBid.bidder
             listing.active = False
@@ -130,11 +139,36 @@ def listings(request, pk):
         return render(request, "auctions/listing.html", {
             "listing": listing,
             "message": message,
-            "form": AddBid()
+            "comments": comments,
+            "bid_form": AddBid(),
+            "comment_form": AddComment()
         })
 
     else:
         return render(request, "auctions/listing.html", {
             "listing": listing,
-            "form": AddBid()
+            "comments": comments,
+            "bid_form": AddBid(),
+            "comment_form": AddComment()
+        })
+
+@login_required
+def watchlist(request, username):
+    watchlist = request.user.watchlist.all()
+    return render(request, "auctions/watchlist.html", {
+        "watchlist": watchlist
+    })
+
+def categories(request, name=None):
+    if name is None:
+        categories = Category.objects.all().order_by("name")
+        return render(request, "auctions/categories.html", {
+            "categories": categories
+        })
+    else:
+        category = Category.objects.get(name=name)
+        listings = Listing.objects.filter(category=category)
+        return render(request, "auctions/category.html", {
+            "category": category,
+            "listings": listings
         })
