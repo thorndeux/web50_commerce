@@ -1,35 +1,75 @@
 {% extends "auctions/layout.html" %}
+{% comment %}
+Home page shows all active listings.
+Serves as template for category and user watchlist pages.
+{% endcomment %}
+{% load humanize static%}
 
 {% block body %}
-    <h2>Active Listings</h2>
-
-    <div class="container-flex">
-        <div class="row">
+<div class="row">
+    <div class="col-1"></div>
+    {% comment %} Middle part contains content {% endcomment %}
+    <div class="col-10">
+        {% comment %} Alert for messaging {% endcomment %}
+        {% if message %}
+        <div class="alert alert-{{ type }}" role="alert" id="message">
+            <p class="m-0">{{ message }}</p>
+        </div>
+        {% endif %}
+        {% comment %} Heading can be overridden by inheriting pages {% endcomment %}
+        <h2 class="ml-3">
+        {% block heading %}
+        Active Listings
+        {% endblock heading %}
+        </h2>
+        {% comment %} Two listings per row on large screens, one on smaller ones {% endcomment %}
+        <div class="row row-cols-1 row-cols-xl-2">
             {% for listing in listings %}
-            <div class="card col-12 col-xl-6">
-                <div class="card-body container-fluid">
-                    <div class="row">            
-                        <div class="col-6 col-lg-5 col-xl-6">
-                            {% if listing.imageURL != "" %}
-                            <img class="img-thumbnail" src="{{ listing.imageURL }}" alt="{{ listing.title }}">
-                            {% else %}
-                            <img class="img-thumbnail" src="https://i.ibb.co/zR2Z0G0/water-lily-3784022-1280.jpg" alt="Water Lilies">
-                            {% endif %}
-                        </div>
-                        <div class="col-6 col-lg-7 col-xl-6">
-                            <a href="{% url 'listings' listing.pk %}">
-                                <h4 class="card-title">{{ listing.title }}</h4>
-                            </a> 
-                            <h6 class="card-subtitle mb-2 text-muted">{{ listing.owner }} - {{ listing.time }}</h6>
-                            <p class="card-text">{{ listing.description }}</p>
-                        </div>
-                    </div>            
+            <div class="col">
+                {% comment %} One card per listing {% endcomment %}
+                <div class="card listing-card m-1">
+                    <div class="card-body">
+                        <div class="row">
+                            {% comment %} Left part contains the image {% endcomment %}
+                            <div class="col-6 col-lg-5 col-xl-6">
+                                {% if listing.imageURL %}
+                                <img class="img-thumbnail" src="{{ listing.imageURL }}" alt="{{ listing.title }}">
+                                {% else %}
+                                <img class="img-thumbnail" src="{% static 'auctions/img/placeholder.jpg' %}" alt="No image">
+                                {% endif %}
+                            </div>
+                            {% comment %} Right part contains listing info {% endcomment %}
+                            <div class="col-6 col-lg-7 col-xl-6">
+                                {% comment %} Title as link {% endcomment %}
+                                <a href="{% url 'listings' listing.pk %}">
+                                    <h4 class="card-title">{{ listing.title }}</h4>
+                                </a>
+                                {% comment %} Listed by whom and when {% endcomment %}
+                                <p class="card-subtitle mb-2 text-muted">{{ listing.owner }} - {{ listing.time|naturaltime }}</p>
+                                {% comment %} Description {% endcomment %}
+                                <p class="card-text">{{ listing.description }}</p>
+                                {% comment %} Price {% endcomment %}
+                                <strong class="card-text">
+                                    {% if listing.currentBid %}
+                                    ${{ listing.currentBid.bid|intcomma }}
+                                    {% else %}
+                                    ${{ listing.startingBid|intcomma }}
+                                    {% endif %}
+                                    </strong>
+                            </div>
+                        </div>            
+                    </div>
                 </div>
             </div>
-            <div class="w-100{% if forloop.counter0|divisibleby:2 %} d-xl-none{% endif %}"></div>
             {% empty %}
-            <p>There are no active listings at the moment. Please check back later.</p>
+            <div class="col ml-3">
+            {% block empty %}
+            There are no active listings at the moment. Please check back later.
+            {% endblock empty %}
+            </div>
             {% endfor %}
         </div>
     </div>
+    <div class="col-1"></div> 
+</div>
 {% endblock %}

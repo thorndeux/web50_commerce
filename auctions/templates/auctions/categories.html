@@ -1,13 +1,23 @@
 {% extends "auctions/layout.html" %}
+{% comment %} Lists all categories as links {% endcomment %}
 
 {% block body %}
-<div class="container">
-    <ul>
-        {% for category in categories %}
-        <li>
-            <a href="{% url 'category' category.name %}">{{ category }}</a>
-        </li>
-        {% endfor %}
-    </ul>
+<div class="row">
+    <div class="col-3"></div>
+    <div class="col-6">
+        <div class="card" style="width: 16rem;">
+            <div class="card-header">
+                <h2 class="m-0">Categories</h2>
+            </div>
+            <ul class="list-group list-group-flush">
+            {% for category in categories %}
+                <li class="list-group-item">
+                    <a href="{% url 'category' category.name %}"><h3 class="m-0">{{ category }}</h3></a>           
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="col-3"></div>
 </div>
 {% endblock body %}

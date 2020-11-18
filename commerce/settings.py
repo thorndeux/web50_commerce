@@ -32,13 +32,15 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'auctions',
+    # SASS compressor
     'compressor',
-    'djmoney',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
+    # Formatter for currency/time
+    'django.contrib.humanize',
     'django.contrib.messages',
+    'django.contrib.sessions',
     'django.contrib.staticfiles',
 ]
 

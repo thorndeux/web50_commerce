@@ -1,10 +1,24 @@
 {% extends "auctions/layout.html" %}
+{% comment %} Create a new listing {% endcomment %}
 
 {% block body %}
+<div class="container">
+    {% comment %} Alert for messaging {% endcomment %}
+    {% if message %}
+    <div class="alert alert-{{ type }}" role="alert" id="message">
+        <p class="m-0">{{ message }}</p>
+    </div>
+    {% endif %}
     <h2>New Listing</h2>
     <form action="{% url 'new_listing' %}" method="post">
         {% csrf_token %}
-        {{ form }}
+        {% for field in form %}
+        <div class="form-group">
+            {{ field.label_tag }}
+            {{ field }}
+        </div>
+        {% endfor %}
         <button class="btn btn-primary" type="submit">Submit</button>
     </form>
+</div>
 {% endblock %}

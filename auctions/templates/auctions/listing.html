@@ -1,85 +1,128 @@
 {% extends "auctions/layout.html" %}
+{% comment %} Detailed info on each listing {% endcomment %}
+{% load humanize static %}
 
 {% block body %}
 <div class="container">
+    {% comment %} Alert for messaging {% endcomment %}
     {% if message %}
-    <div id="message">
-        <p>{{ message }}</p>
+    <div class="alert alert-{{ type }}" role="alert" id="message">
+        <p class="m-0">{{ message }}</p>
     </div>
     {% endif %}
 
+    {% comment %} Closed auction notification {% endcomment %}
     {% if listing.active == False %}
     <div id="closed">
-        {% if user == listing.winner %}
-        <h6>Congratulations! You won the auction.</h6>
-        {% else %}
-        <h6>This auction is closed!</h6>
+        <div class="alert alert-info">
+            {% if user == listing.winner %}
+            <strong>Congratulations! You won the auction.</strong>
+            {% else %}
+            <strong>This auction is closed!</strong>
         {% endif %}
+        </div>
     </div>        
     {% endif %}
     
-    <div id="main">
-        <h2>{{ listing.title }}</h2>
+    {% comment %} Listing starts here {% endcomment %}
+    <div class="card mb-4" id="main">
+        <div class="card-body">
+            <div class="mb-2">
+                {% comment %} Title {% endcomment %}
+                <h2 class="card-title d-inline">{{ listing.title }}</h2>
+                {% comment %} 'Close auction' button for the owner {% endcomment %}
+                {% if user == listing.owner and listing.active == True %}
+                <form class="d-inline ml-4" action="{% url 'listings' listing.pk %}" method="POST">
+                    {% csrf_token %}
+                    <button name="close" class="btn btn-danger mt-n2" type="submit">Close Auction</button>
+                </form>
+                {% endif %}
+            </div>
+            {% comment %} Posten by whom and when {% endcomment %}
+            <p class="text-muted"> Listed by {{ listing.owner }} on {{ listing.time }}</p>
+            {% comment %} Image {% endcomment %}
+            {% if listing.imageURL %}
+            <img class="img-thumbnail" src="{{ listing.imageURL }}" alt="{{ listing.title }}">
+            {% else %}
+            <img class="img-thumbnail" src="{% static 'auctions/img/placeholder.jpg' %%}" alt="No image">
+            {% endif %}
+            {% comment %} Description {% endcomment %}
+            <p class="border my-4 p-2">{{ listing.description }}</p>
+            {% comment %} Starting bid {% endcomment %}
+            <p>Starting bid: <strong>${{ listing.startingBid|intcomma }}</strong></p>
+            {% comment %} Info on highest bid {% endcomment %}
+            <p>{% if listing.active %}
+            Current bid:
+            {% else %}
+            Winning bid:
+            {% endif %}
+            {% if listing.currentBid %}
+            <strong>${{ listing.currentBid.bid|intcomma }}</strong>
+            {% else %}
+            Nobody has placed a bid yet.
+            {% endif %}</p>
+            
+            {% comment %} Stuff for logged in users {% endcomment %}
+            {% if user.is_authenticated %}
+            <div class="row">
+                {% if listing.active == True %}
+                {% comment %} Place a bid {% endcomment %}
+                <div class="col">
+                    <form action="{% url 'listings' listing.pk %}" method="POST">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            {{ bid_form.bid }}
+                            <div class="input-group-append">
+                                <button name="new_bid" class="btn btn-primary" type="submit">Place Bid</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+                {% comment %} Add to/remove from watchlist {% endcomment %}
+                <div class="col">
+                    <form class="float-right" action="{% url 'listings' listing.pk %}" method="POST">
+                    {% csrf_token %}
+                    {% if listing in user.watchlist.all %}
+                    <input class="form-check-input" type="checkbox" checked disabled> 
+                    <button name="watchlist" class="btn btn-primary" type="submit" value="checked">Remove from Watchlist</button>
+                    {% else %}
+                        {% if listing.active == True %}
+                        <input class="form-check-input mt-2" type="checkbox" disabled>
+                        <button name="watchlist" class="btn btn-primary" type="submit">Add to Watchlist</button>
+                        {% endif %}
+                    {% endif %}
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 
-        {% if user == listing.owner and listing.active == True %}
-        <form action="{% url 'listings' listing.pk %}" method="POST">
-            {% csrf_token %}
-            <button name="close" class="btn btn-danger" type="submit">Close Auction</button>
-        </form>
-        {% endif %}
+    {% comment %} Comment section {% endcomment %}
+    <div id="comments">
+        {% comment %} Existing comments {% endcomment %}
+        {% for comment in comments %}
+        <div class="card m-1">
+            <div class="card-header text-muted">
+                {{ comment.commenter }} commented<span class="float-right">{{ comment.time|naturaltime }}</span>
+            </div>
+            <div class="card-body">
+                <p>
+                    {{ comment.content }}
+                </p>    
+            </div>
+        </div>    
+        {% endfor %}
 
-        
-
-        <img src="{{ listing.imageURL }}" alt="{{ listing.title }}">
-        <p class="text-muted"> Listed by {{ listing.owner }} on {{ listing.time }}</p>
-        <p>{{ listing.description }}</p>
-        <p>Starting bid: {{ listing.startingBid }}</p>
-        <p>{% if listing.active %}
-        Current bid:
-        {% else %}
-        Winning bid:
-        {% endif %}
-        {{ listing.currentBid.bid }}</p>
-        
+        {% comment %} Logged in users can add a comment {% endcomment %}
         {% if user.is_authenticated %}
-        {% if listing.active == True %}
-        <form action="{% url 'listings' listing.pk %}" method="POST">
-            {% csrf_token %}
-            {{ bid_form }}
-            <button name="new_bid" class="btn btn-primary" type="submit">Place Bid</button>
-        </form>
-        {% endif %}
         <form action="{% url 'listings' listing.pk %}" method="POST">
             {% csrf_token %}    
-            {% if listing in user.watchlist.all %}
-            <input class="form-check-input" type="checkbox" checked disabled> 
-            <button name="watchlist" class="btn btn-primary" type="submit" value="checked">Remove from Watchlist</button>
-            {% else %}
-            {% if listing.active == True %}
-            <input class="form-check-input" type="checkbox" disabled>
-            <button name="watchlist" class="btn btn-primary" type="submit">Add to Watchlist</button>
-            {% endif %}
-            {% endif %}
+            {{ comment_form.comment }}
+            <button name="new_comment" class="btn btn-primary float-right m-1" type="submit">Add Comment</button>
         </form>
         {% endif %}
-    </div>
-    <div id="comments">
-    {% if user.is_authenticated %}
-    <form action="{% url 'listings' listing.pk %}" method="POST">
-    {% csrf_token %}    
-    {{ comment_form }}
-    <button name="new_comment" class="btn btn-primary" type="submit">Add Comment</button>
-    </form>
-    {% endif %}
-    {% for comment in comments %}    
-    <p class="text-muted">
-        {{ comment.commenter }}
-        {{ comment.time }}
-    </p>
-    <p>
-        {{ comment.content }}
-    </p>    
-    {% endfor %}
     </div>
 </div>
 {% endblock %}

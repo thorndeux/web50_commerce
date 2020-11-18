@@ -1,31 +1,10 @@
-{% extends "auctions/layout.html" %}
+{% extends "auctions/index.html" %}
+{% comment %}Shows a user's watchlist {% endcomment %}
 
-{% block body %}
-<div class="row">
-        {% for listing in watchlist %}
-        <div class="card col-12 col-xl-6">
-            <div class="card-body container-fluid">
-                <div class="row">            
-                    <div class="col-6 col-lg-5 col-xl-6">
-                        {% if listing.imageURL != "" %}
-                        <img class="img-thumbnail" src="{{ listing.imageURL }}" alt="{{ listing.title }}">
-                        {% else %}
-                        <img class="img-thumbnail" src="https://i.ibb.co/zR2Z0G0/water-lily-3784022-1280.jpg" alt="Water Lilies">
-                        {% endif %}
-                    </div>
-                    <div class="col-6 col-lg-7 col-xl-6">
-                        <a href="{% url 'listings' listing.pk %}">
-                            <h4 class="card-title">{{ listing.title }}</h4>
-                        </a> 
-                        <h6 class="card-subtitle mb-2 text-muted">{{ listing.owner }} - {{ listing.time }}</h6>
-                        <p class="card-text">{{ listing.description }}</p>
-                    </div>
-                </div>            
-            </div>
-        </div>
-        <div class="w-100{% if forloop.counter0|divisibleby:2 %} d-xl-none{% endif %}"></div>
-        {% empty %}
-        <p>You have no items on your watchlist at the moment.</p>
-        {% endfor %}
-    </div>
-{% endblock body %}
+{% block heading %}
+{{ user }}'s Watchlist
+{% endblock heading %}
+
+{% block empty %}
+You have no items on your watchlist at the moment.
+{% endblock empty %}

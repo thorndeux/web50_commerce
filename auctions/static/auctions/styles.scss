@@ -1,5 +1,21 @@
+// Override the bootstrap theme-colors:
+$navbar-light-color: lighten(darkslategrey, 15%);
+$navbar-light-hover-color: darkslategrey;
+$theme-colors: (
+  "primary": lighten(darkslategrey, 15%),
+  "danger": firebrick,
+  "success": forestgreen,
+  "info": steelblue
+);
+
 @import './bootstrap/bootstrap.scss';
 
-body {
-    padding: 10px;
+// Makes sure all listing cards in a row have the same height
+.listing-card {
+    height: 95%;
+}
+
+// Makes navbar slightly translucent
+.navbar {
+    background-color: rgba(white, 0.9);
 }
