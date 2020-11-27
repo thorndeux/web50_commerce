@@ -24,7 +24,7 @@ class Listing(models.Model):
     owner = models.ForeignKey(User, on_delete=models.SET("deleted"), related_name="listings")
     title = models.CharField(max_length=128)
     description = models.CharField(max_length=1024)
-    startingBid = models.DecimalField(max_digits=8, decimal_places=2)
+    startingPrice = models.DecimalField(max_digits=8, decimal_places=2)
     currentBid = models.ForeignKey("Bid", null=True, blank=True, on_delete=models.SET_NULL, related_name="highestBid")
     imageURL = models.URLField(max_length=200, blank=True)
     category = models.ForeignKey("Category", null=True, blank=True, on_delete=models.SET_NULL, related_name="listings")

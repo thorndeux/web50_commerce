@@ -48,8 +48,8 @@
             {% endif %}
             {% comment %} Description {% endcomment %}
             <p class="border my-4 p-2">{{ listing.description }}</p>
-            {% comment %} Starting bid {% endcomment %}
-            <p>Starting bid: <strong>${{ listing.startingBid|intcomma }}</strong></p>
+            {% comment %} Starting price {% endcomment %}
+            <p>Starting price: <strong>${{ listing.startingPrice|floatformat:2|intcomma }}</strong></p>
             {% comment %} Info on highest bid {% endcomment %}
             <p>{% if listing.active %}
             Current bid:
@@ -57,7 +57,7 @@
             Winning bid:
             {% endif %}
             {% if listing.currentBid %}
-            <strong>${{ listing.currentBid.bid|intcomma }}</strong>
+            <strong>${{ listing.currentBid.bid|floatformat:2|intcomma }}</strong>
             {% else %}
             Nobody has placed a bid yet.
             {% endif %}</p>
@@ -104,8 +104,11 @@
         {% comment %} Existing comments {% endcomment %}
         {% for comment in comments %}
         <div class="card m-1">
-            <div class="card-header text-muted">
-                {{ comment.commenter }} commented<span class="float-right">{{ comment.time|naturaltime }}</span>
+            <div class="card-header">
+                <strong>{{ comment.commenter }}</strong> 
+                <span class="text-muted">
+                commented<span class="float-right">{{ comment.time|naturaltime }}</span>
+                </span>
             </div>
             <div class="card-body">
                 <p>

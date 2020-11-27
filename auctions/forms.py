@@ -11,9 +11,9 @@ class ListingForm(forms.ModelForm):
     """
     class Meta:
         model = Listing
-        fields = ['title', 'description', 'startingBid', 'imageURL', 'category']
+        fields = ['title', 'description', 'startingPrice', 'imageURL', 'category']
         labels = {
-            'startingBid': "Starting Bid",
+            'startingPrice': "Starting Price",
             'imageURL': "Image URL (optional)",
             'category': "Category (optional)"
         }
@@ -29,7 +29,7 @@ class ListingForm(forms.ModelForm):
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class': "form-control"})
         self.fields['title'].widget.attrs.update({'placeholder': "Your title here"})
-        self.fields['startingBid'].widget.attrs.update({'placeholder': "$0.00"})
+        self.fields['startingPrice'].widget.attrs.update({'placeholder': "$0.00"})
         self.fields['imageURL'].widget.attrs.update({'placeholder': "Add an image url for your item"})
 
 class AddBid(forms.Form):

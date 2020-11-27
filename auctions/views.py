@@ -93,7 +93,7 @@ def new_listing(request):
             # Set required values
             listing.title = form.cleaned_data["title"]
             listing.description = form.cleaned_data["description"]
-            listing.startingBid = form.cleaned_data["startingBid"]
+            listing.startingPrice = form.cleaned_data["startingPrice"]
             # Set optional values
             if form.cleaned_data["imageURL"]:
                 listing.imageURL = form.cleaned_data["imageURL"]
@@ -161,7 +161,7 @@ def listings(request, pk):
             if (listing.currentBid is not None and new_bid < listing.currentBid.bid):
                 message = "Your bid must be higher than the current bid."
                 message_type = "danger"
-            elif new_bid < listing.startingBid:
+            elif new_bid < listing.startingPrice:
                 message = "Your bid must be higher than the starting bid."
                 message_type = "danger"
             # If bid is valid

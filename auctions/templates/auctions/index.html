@@ -51,9 +51,9 @@ Serves as template for category and user watchlist pages.
                                 {% comment %} Price {% endcomment %}
                                 <strong class="card-text">
                                     {% if listing.currentBid %}
-                                    ${{ listing.currentBid.bid|intcomma }}
+                                    ${{ listing.currentBid.bid|floatformat:2|intcomma }}
                                     {% else %}
-                                    ${{ listing.startingBid|intcomma }}
+                                    ${{ listing.startingPrice|floatformat:2|intcomma }}
                                     {% endif %}
                                     </strong>
                             </div>
