@@ -11,8 +11,12 @@ $theme-colors: (
 @import './bootstrap/bootstrap.scss';
 
 // Makes sure all listing cards in a row have the same height
+// and adds a hover effect to the card
 .listing-card {
     height: 95%;
+    &:hover {
+      background-color: darken(white, 5%);
+    }
 }
 
 // Makes navbar slightly translucent
